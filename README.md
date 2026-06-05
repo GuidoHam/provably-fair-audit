@@ -62,11 +62,13 @@ node src/index.js --games dice,crash --count 500000
 
 **No dependencies to install.** Uses only Node.js built-in `crypto` module.
 
-## Statistical Tests
+## Statistical Tests (Community Edition)
+
+This open-source tool includes **8 foundational tests** — enough to catch obvious manipulation, but not the full picture.
 
 All tests use **significance level alpha = 0.01** (99% confidence). A casino passes if **>= 75% of tests pass** per NIST recommendation.
 
-### NIST SP 800-22 Rev. 1a Tests
+### Included: NIST SP 800-22 Core Tests
 
 | Test | What It Detects | Section |
 |------|-----------------|---------|
@@ -74,17 +76,30 @@ All tests use **significance level alpha = 0.01** (99% confidence). A casino pas
 | **Runs Test** | Repeating patterns (e.g., 0-0-0-0-1-1-1-1) | SP 800-22 Section 2.3 |
 | **Block Frequency** | Local bias within 128-bit blocks | SP 800-22 Section 2.2 |
 | **Cumulative Sums** | Drift — outcomes trending in one direction | SP 800-22 Section 2.13 |
+| **Chi-Square Goodness of Fit** | Distribution not matching expected uniform (100 bins) | — |
+| **Kolmogorov-Smirnov** | Any deviation from uniform distribution (Stephens correction) | — |
+| **Serial Correlation** | Lag-1 autocorrelation (sequential dependence) | — |
+| **Runs Up/Down** | Trending sequences (Wald-Wolfowitz) | — |
 
-### Additional Statistical Tests
+### Not Included: What the Full Audit Adds
 
-| Test | What It Detects |
-|------|-----------------|
-| **Chi-Square Goodness of Fit** | Distribution not matching expected uniform (100 bins) |
-| **Kolmogorov-Smirnov** | Any deviation from uniform distribution (Stephens correction) |
-| **Serial Correlation** | Lag-1 autocorrelation (sequential dependence) |
-| **Runs Up/Down** | Trending sequences (Wald-Wolfowitz) |
+Our published audits on [fairplayaudit.com](https://fairplayaudit.com) use an **extended proprietary suite of 30+ tests** that goes far beyond basic RNG verification:
 
-### Game-Specific Tests
+| Category | What It Catches | Why It Matters |
+|----------|-----------------|----------------|
+| **Advanced NIST Tests** | Approximate Entropy, Linear Complexity, Maurer's Universal, Non-overlapping Templates, Longest Run | Detects subtle non-randomness that basic tests miss — patterns a casino could exploit without failing simple checks |
+| **Cross-Game Correlation** | Same seed producing correlated outcomes across Dice, Crash, Roulette simultaneously | A casino could pass per-game tests while leaking information between games |
+| **Seed Rotation Analysis** | Suspicious timing of seed changes, unusually short seed lifespans after big wins | If a casino rotates seeds only after players win, that's a red flag no single-seed test catches |
+| **Time-Series Drift** | Outcomes shifting over time — fair for 10k rounds, then gradually biased | A slow drift is invisible in aggregate statistics but devastates long-term players |
+| **Crash Normalization** | Non-standard multiplier distributions, hidden house edge above advertised rate | Many crash games claim 1-3% edge but the actual math shows 5-8% |
+| **Behavioral Triggers** | Outcome patterns changing after deposits, after win streaks, after VIP tier changes | The most sophisticated manipulation — personalized unfairness |
+| **Multi-Session Persistence** | Whether randomness degrades across sessions with the same player | Tests if the casino "remembers" winning players |
+
+**Why this matters:** A casino that passes all 8 tests in this tool is *probably* fair — but "probably" isn't good enough when real money is on the line. The [full audit reports](https://fairplayaudit.com) test deeper, across more dimensions, with proprietary detection methods we don't publish.
+
+> **Think of it this way:** This tool is a breathalyzer. Our full audit is a blood test. Both detect alcohol — but only one holds up in court.
+
+### Game-Specific Tests (included)
 
 | Test | Applied To |
 |------|-----------|
@@ -212,8 +227,25 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. We welcome:
 
 [MIT](LICENSE) — Use it, fork it, audit your favorite casino.
 
+## Community Edition vs. Full Audit
+
+| | This Tool (Free) | Full Audit (fairplayaudit.com) |
+|---|---|---|
+| **Tests** | 8 core NIST tests | 30+ tests incl. proprietary |
+| **Scope** | Single seed pair | Multiple sessions, time-series, cross-game |
+| **Output** | Pass/Fail + p-values | Detailed report with risk assessment |
+| **Detection** | Basic RNG manipulation | Behavioral triggers, drift, correlation |
+| **Casino coverage** | DIY (bring your own seeds) | Pre-audited with published results |
+| **Updates** | Community-driven | Continuously improved |
+
+**Want the full picture?** Read our published audits at [fairplayaudit.com](https://fairplayaudit.com) — or submit your own seeds for a professional assessment.
+
 ## About
 
-Built by [FairPlay Audit](https://fairplayaudit.com) — independent statistical auditing for provably fair crypto casinos. No casino pays us to audit them. We receive no compensation for favorable results. Affiliate links are only placed for casinos that pass the full test suite.
+Built by [FairPlay Audit](https://fairplayaudit.com) — independent statistical auditing for provably fair crypto casinos. Run by an ex-pit boss with 10+ years of casino operations experience.
 
+No casino pays us to audit them. We receive no compensation for favorable results. Affiliate links are only placed for casinos that pass the full 30+ test suite.
+
+**Full audits:** [fairplayaudit.com](https://fairplayaudit.com)
 **Contact:** pitboss@fairplayaudit.com
+**Telegram:** Coming soon
