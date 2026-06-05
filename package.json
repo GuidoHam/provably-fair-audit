@@ -1,0 +1,32 @@
+{
+  "name": "provably-fair-audit",
+  "version": "2.0.0",
+  "description": "FairPlay Audit — NIST SP 800-22 Statistical Fairness Verification for Provably Fair Casino Games",
+  "author": "FairPlay Audit (https://fairplayaudit.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuidoHam/provably-fair-audit"
+  },
+  "keywords": [
+    "provably-fair",
+    "casino-audit",
+    "nist-sp-800-22",
+    "rng-testing",
+    "crypto-casino",
+    "fairness-verification",
+    "hmac-sha256",
+    "statistical-testing"
+  ],
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "generate": "node src/index.js",
+    "collect": "node src/collector.js",
+    "test-rng": "node src/rng-tester.js",
+    "report": "node src/report-generator.js"
+  },
+  "dependencies": {
+    "randomness": "^0.0.0-development"
+  }
+}

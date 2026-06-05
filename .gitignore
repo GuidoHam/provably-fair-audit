@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Generated data (reproducible from seeds)
+data/*.json
+
+# Generated reports (reproducible from seeds)
+reports/*.html
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Internal scripts (Ghost CMS helpers, not part of the audit tool)
+scripts/
