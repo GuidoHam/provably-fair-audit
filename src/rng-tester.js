@@ -680,7 +680,7 @@ function main() {
   // Save results
   const outputPath = join(dataDir, 'test_results.json');
   const output = {
-    auditId: `KYC-TEST-${Date.now()}`,
+    auditId: `FPA-TEST-${Date.now()}`,
     timestamp: new Date().toISOString(),
     methodology: 'NIST SP 800-22 + Custom Gaming Tests',
     significanceLevel: 0.01,

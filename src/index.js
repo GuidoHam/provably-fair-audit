@@ -12,10 +12,11 @@
  * https://fairplayaudit.com
  */
 
-import { createHmac } from 'crypto';
-import { writeFileSync, mkdirSync } from 'fs';
+import { createHmac, createHash } from 'crypto';
+import { writeFileSync, readFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -91,7 +92,7 @@ async function main() {
   // ---- AUDIT PROTOCOL ----
   // Document seed selection methodology for transparency
   const auditProtocol = {
-    auditId: `KYC-${Date.now()}`,
+    auditId: `FPA-${Date.now()}`,
     timestamp: new Date().toISOString(),
     casino: config.casino,
     methodology: {
@@ -258,6 +259,61 @@ async function main() {
   const reportPath = join(reportDir, filename);
   writeFileSync(reportPath, html);
 
+  // ---- STEP 4: DATA INTEGRITY (SHA-256 + PGP) ----
+  console.log('\n' + '━'.repeat(60));
+  console.log('STEP 4/4: DATA INTEGRITY HASHING & SIGNING');
+  console.log('━'.repeat(60));
+
+  // SHA-256 hash of raw data (outcomes + test results)
+  const rawDataJson = JSON.stringify(fullResults, null, 2);
+  const dataHash = createHash('sha256').update(rawDataJson).digest('hex');
+
+  // SHA-256 hash of the HTML report
+  const reportHash = createHash('sha256').update(html).digest('hex');
+
+  // Write integrity manifest
+  const integrityManifest = {
+    auditId: auditProtocol.auditId,
+    timestamp: auditProtocol.timestamp,
+    casino: config.casino,
+    hashes: {
+      algorithm: 'SHA-256',
+      rawData: dataHash,
+      htmlReport: reportHash,
+      note: 'Hashes computed over the JSON test results and HTML scorecard. Verify with: sha256sum <file>'
+    },
+    verification: {
+      pgpKey: 'pitboss@fairplayaudit.com',
+      fingerprint: 'FC6C E2D2 A721 409A 1E94 EF07 1F1E F6DA 6A77 0EB9',
+      publicKeyUrl: 'https://fairplayaudit.com/pgp/'
+    }
+  };
+
+  const manifestPath = join(reportDir, `integrity_${safeName}_${new Date().toISOString().split('T')[0]}.json`);
+  writeFileSync(manifestPath, JSON.stringify(integrityManifest, null, 2));
+
+  // Attempt PGP signing (if gpg is available)
+  let pgpSigned = false;
+  try {
+    execSync(`gpg --version`, { stdio: 'pipe' });
+    const sigPath = manifestPath + '.sig';
+    execSync(`gpg --batch --yes --local-user pitboss@fairplayaudit.com --detach-sign --armor --output "${sigPath}" "${manifestPath}"`, { stdio: 'pipe' });
+    pgpSigned = true;
+    console.log(`PGP Signature: ${sigPath}`);
+  } catch (e) {
+    console.log('PGP signing skipped (gpg not available or no key found)');
+  }
+
+  console.log(`Data Hash:     ${dataHash}`);
+  console.log(`Report Hash:   ${reportHash}`);
+  console.log(`Manifest:      ${manifestPath}`);
+  console.log(`PGP Signed:    ${pgpSigned ? 'YES' : 'NO (sign manually on VPS)'}`);
+
+  // Also append integrity info to the full results JSON
+  fullResults.integrity = integrityManifest.hashes;
+  fullResults.integrity.pgpFingerprint = integrityManifest.verification.fingerprint;
+  writeFileSync(join(dataDir, 'test_results.json'), JSON.stringify(fullResults, null, 2));
+
   // ---- SUMMARY ----
   console.log('\n' + '═'.repeat(60));
   console.log('SCORECARD COMPLETE');
@@ -268,6 +324,8 @@ async function main() {
   console.log(`Tests:         ${totalPassed}/${totalTests} passed`);
   console.log(`Outcomes:      ${(config.count * config.games.length).toLocaleString()}`);
   console.log(`Report:        ${reportPath}`);
+  console.log(`Data SHA-256:  ${dataHash.slice(0, 16)}...`);
+  console.log(`PGP Signed:    ${pgpSigned ? 'YES ✓' : 'NO (manual)'}`);
   console.log('═'.repeat(60));
 }
 

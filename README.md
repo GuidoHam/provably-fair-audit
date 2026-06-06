@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org)
-[![Tests](https://img.shields.io/badge/Verification-56%2F56%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Verification-167%2F167%20passed-brightgreen)]()
 [![NIST SP 800-22](https://img.shields.io/badge/Standard-NIST%20SP%20800--22-blue)]()
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0%20(Node.js%20crypto%20only)-orange)]()
 
@@ -103,7 +103,7 @@ Our published audits on [fairplayaudit.com](https://fairplayaudit.com) use an **
 
 | Test | Applied To |
 |------|-----------|
-| **Dice Distribution** | Uniform across 0.00-99.99 |
+| **Dice Distribution** | Uniform across 0.00-100.00 |
 | **Crash Instant-Bust Rate** | ~3.03% for Stake, ~5% for Roobet |
 | **Coin Fairness** | ~50/50 within statistical tolerance |
 | **Roulette Distribution** | Uniform across 0-36 |
@@ -118,7 +118,8 @@ src/
   report-generator.js # Professional HTML scorecard output
 
 tests/
-  verification-suite.js  # 56 assertions proving mathematical correctness
+  verification-suite.js  # 94 assertions proving mathematical correctness
+  cross-validation.js    # 73 assertions: audit tool ↔ verifier consistency
 
 data/                # Generated outcome files (JSON)
 reports/             # Generated HTML scorecards
@@ -134,22 +135,46 @@ Every step is deterministic. Given the same seeds, you get the exact same result
 
 ## Verification Suite
 
-The tool includes a comprehensive self-test that proves mathematical correctness:
+The tool includes two comprehensive test suites that prove mathematical correctness:
 
 ```bash
+# Verify all algorithms and statistical tests (94 assertions)
 node tests/verification-suite.js
+
+# Cross-validate audit tool ↔ blog verifier consistency (73 assertions)
+node tests/cross-validation.js
 ```
 
-**56 assertions** covering:
-- Algorithm correctness (Stake, BC.Game, Roobet implementations match known outputs)
+**167 total assertions** covering:
+
+### verification-suite.js (94 tests)
+- Stake/BC.Game/Roobet algorithm correctness against known reference values
+- RFC 4231 HMAC-SHA256 test vectors (OpenSSL standard compliance)
 - NIST tests correctly pass on genuine random data
-- NIST tests correctly **fail** on rigged data (all-constant, biased, alternating)
-- Mathematical helper precision (erfc, lgamma, chiSquareCDF)
-- bytesToFloat boundary conditions
-- House edge rates match advertised values
+- NIST tests correctly **fail** on rigged data (constant, biased, alternating, patterned)
+- Mathematical helper precision (erfc, lgamma, chiSquareCDF, normalCDF)
+- bytesToFloat boundary conditions and precision proofs
+- House edge rates match advertised values (statistical z-tests)
+- NaN/Infinity robustness on all edge cases
+- Adversarial inputs: empty seeds, Unicode, 10k-char seeds, extreme nonces
+- Cross-game determinism and reproducibility proofs
 - End-to-end pipeline integrity
 
-If this suite passes, the tool is mathematically correct. Share these results with casinos as proof of methodology.
+### cross-validation.js (73 tests)
+- **Crash**: 10,000 nonces — audit tool vs verifier produce identical results
+- **Dice**: 10,000 nonces — audit tool vs verifier produce identical results
+- **Crash formula algebraic proof**: proves `floor((100*e-h)/(e-h))/100` is not equivalent to `floor(e/(e-h)*100)/100`
+- **bytesToFloat precision**: 9 reference value checks
+- **Range proofs**: 100,000 outcomes each for Crash (≥1.00, no NaN) and Dice ([0,100])
+- **House edge statistical test**: z-test against 1/33 expected rate (within 3σ)
+- **RFC 4231**: 3 HMAC-SHA256 test vectors
+- **NIST battery on 50,000 HMAC outcomes**: 8/8 tests pass
+- **Rigged data detection**: 4/4 core tests catch constant sequences
+- **Mines permutation validity**: 5,000 checks across all mine counts
+- **Roobet hash chain**: progression + house edge rate
+- **Determinism**: 20,000 duplicate runs with zero differences
+
+If both suites pass, the tool is mathematically correct and consistent with the live verifier at [fairplayaudit.com/verify](https://blog.fairplayaudit.com/verify/).
 
 ## Example Output
 

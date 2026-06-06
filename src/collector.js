@@ -190,7 +190,7 @@ function verifyHash(serverSeed, clientSeed, nonce, expectedHash) {
  * Get the server seed hash (what casino shows before revealing seed)
  */
 function hashServerSeed(serverSeed) {
-  return createHmac('sha256', serverSeed).update('').digest('hex');
+  return createHash('sha256').update(serverSeed).digest('hex');
 }
 
 // ============================================================
@@ -229,7 +229,8 @@ function main() {
         collectedAt: new Date().toISOString(),
         collector: 'FairPlay Audit Scorecard Tool v2.0'
       },
-      outcomes: outcomes.map(o => o.result)
+      outcomes: outcomes.map(o => o.result),
+      rawFloats: outcomes.map(o => o.raw)
     }, null, 2));
 
     console.log(`Saved: ${filename}`);
@@ -237,7 +238,7 @@ function main() {
 
   // Also save combined summary
   const summary = {
-    auditId: `KYC-${Date.now()}`,
+    auditId: `FPA-${Date.now()}`,
     casino: 'Sample Audit',
     timestamp: new Date().toISOString(),
     config: {
