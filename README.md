@@ -2,7 +2,7 @@
 
 **NIST SP 800-22 Statistical Fairness Verification for Crypto Casino Games**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: BSL 1.1](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/Verification-167%2F167%20passed-brightgreen)]()
 [![NIST SP 800-22](https://img.shields.io/badge/Standard-NIST%20SP%20800--22-blue)]()
@@ -250,7 +250,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. We welcome:
 
 ## License
 
-[MIT](LICENSE) — Use it, fork it, audit your favorite casino.
+[Business Source License 1.1](LICENSE) — You may view, modify, and use this code for non-production purposes. Commercial use requires a license from FairPlay Audit. The code converts to Apache 2.0 on 2030-06-06.
 
 ## Community Edition vs. Full Audit
 
