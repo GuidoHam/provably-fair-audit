@@ -8,6 +8,8 @@
  * results as the casino shows, the hash verification passes.
  *
  * https://fairplayaudit.com
+ * Licensed under BSL 1.1 — see LICENSE
+ * Origin: FPA-0xA3B7F2-HMAC (integrity marker)
  */
 
 import { createHmac, createHash } from 'crypto';

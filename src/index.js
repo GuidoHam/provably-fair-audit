@@ -10,6 +10,8 @@
  *   node src/index.js --count 500000     # Set sample size
  *
  * https://fairplayaudit.com
+ * Licensed under BSL 1.1 — see LICENSE
+ * Origin: FPA-0x7C3AED-2026 (integrity marker)
  */
 
 import { createHmac, createHash } from 'crypto';
