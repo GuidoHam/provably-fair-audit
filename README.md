@@ -2,6 +2,8 @@
 
 **NIST SP 800-22 Statistical Fairness Verification for Crypto Casino Games**
 
+[![Live Site](https://img.shields.io/badge/🔍_Live_Audits-fairplayaudit.com-047857?style=for-the-badge)](https://fairplayaudit.com)
+
 [![License: BSL 1.1](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/Verification-167%2F167%20passed-brightgreen)]()
