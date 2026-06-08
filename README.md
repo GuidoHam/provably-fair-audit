@@ -224,7 +224,11 @@ The casino cannot change the server seed after the fact because the hash was com
 
 ## Step-by-Step: How to Collect Your Seeds for Verification
 
-> **IMPORTANT:** You must save the server seed hash BEFORE you rotate your seed. Once rotated, the old hash is gone and cannot be recovered. This hash is your proof that the casino committed to the seed in advance.
+> **⚠️ CRITICAL: Without correct seed handling, no valid audit is possible.**
+>
+> If you don't save the server seed hash BEFORE rotating, you cannot prove the casino didn't swap the seed after seeing your bets. The tool will still run the statistical tests — but without the hash-match verification (Step 4/6), the audit is incomplete. A casino could argue: "We could have given them any seed after the fact."
+>
+> **The math is only as strong as the proof chain behind it.** Save the hash first. Always.
 
 ### Stake.com
 
@@ -282,6 +286,17 @@ node src/index.js \
 | **Client Seed** | You set it yourself | You influenced the randomness — casino can't predict your input |
 | **Revealed Server Seed** | After rotation | The actual seed used — SHA256 of this must match the hash |
 | **Nonce range** | During play | Which bets were made with this seed pair (0, 1, 2, ...) |
+
+### What Happens If You Skip a Step?
+
+| Missing Data | Consequence |
+|---|---|
+| **No server seed hash saved** | Hash-match verification impossible. You can't prove the casino committed to the seed in advance. **The audit is incomplete.** |
+| **No client seed noted** | You can't reproduce the outcomes. The audit cannot be independently verified. |
+| **No nonce range noted** | You don't know which bets were covered. A casino could claim the tested range doesn't match your actual play. |
+| **Server seed not yet revealed** | Nothing to test. You must rotate your seed first so the casino reveals it. |
+
+**Bottom line:** An audit without proper seed handling is like a blood test without a chain of custody — the results might be correct, but they won't hold up if challenged.
 
 ### What the Tool Verifies Automatically
 
