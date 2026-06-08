@@ -138,10 +138,10 @@ function runsTest(outcomes) {
     if (bits[i] !== bits[i - 1]) runs++;
   }
 
-  const expected = 2 * n * pi * (1 - pi);
+  const expected = 2 * n * pi * (1 - pi) + 1;
   const denominator = 2 * Math.sqrt(2 * n) * pi * (1 - pi);
   const zObs = Math.abs(runs - expected) / denominator;
-  let pValue = erfc(zObs);
+  let pValue = erfc(zObs / Math.sqrt(2));
   if (isNaN(pValue) || !isFinite(pValue)) pValue = 0;
 
   return {
