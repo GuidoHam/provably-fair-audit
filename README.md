@@ -4,7 +4,7 @@
 
 [![Live Site](https://img.shields.io/badge/🔍_Live_Audits-fairplayaudit.com-047857?style=for-the-badge)](https://fairplayaudit.com)
 
-[![CI](https://github.com/GuidoHam/provably-fair-audit/actions/workflows/tests.yml/badge.svg)](https://github.com/GuidoHam/provably-fair-audit/actions)
+[![GitLab](https://img.shields.io/badge/Source-GitLab-FC6D26?logo=gitlab)](https://gitlab.com/fairplay-audit/provably-fair-audit)
 [![License: BSL 1.1](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/Verification-167%2F167%20passed-brightgreen)]()
@@ -44,7 +44,7 @@ Adding a new casino requires only implementing its byte-to-outcome mapping in `c
 
 ```bash
 # Clone
-git clone https://github.com/GuidoHam/provably-fair-audit.git
+git clone https://gitlab.com/fairplay-audit/provably-fair-audit.git
 cd provably-fair-audit
 
 # Run full audit (Stake, 100k outcomes per game, sample seeds)
