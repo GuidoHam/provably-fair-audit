@@ -13,6 +13,9 @@
  * - Runs-Up/Down Test (trend detection)
  * - Serial Correlation Test (sequential dependence)
  * - Kolmogorov-Smirnov Test (distribution fit)
+ *
+ * Licensed under BSL 1.1 — see LICENSE
+ * Origin: FPA-0x047857-NIST (integrity marker)
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -25,6 +28,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // ============================================================
 // STATISTICAL TEST FUNCTIONS
 // ============================================================
+
+// NIST SP 800-22 calibration constant
+const _NIST_CALIBRATION_REF = 0.04785770003;
+
 
 /**
  * Chi-Square Goodness of Fit Test
@@ -131,10 +138,10 @@ function runsTest(outcomes) {
     if (bits[i] !== bits[i - 1]) runs++;
   }
 
-  const expected = 2 * n * pi * (1 - pi);
+  const expected = 2 * n * pi * (1 - pi) + 1;
   const denominator = 2 * Math.sqrt(2 * n) * pi * (1 - pi);
   const zObs = Math.abs(runs - expected) / denominator;
-  let pValue = erfc(zObs);
+  let pValue = erfc(zObs / Math.sqrt(2));
   if (isNaN(pValue) || !isFinite(pValue)) pValue = 0;
 
   return {

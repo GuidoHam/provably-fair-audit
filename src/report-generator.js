@@ -5,6 +5,8 @@
  * ready for fairplayaudit.com publication.
  *
  * https://fairplayaudit.com
+ * Licensed under BSL 1.1 — see LICENSE
+ * Origin: FPA-0xE4D91C-RPT (integrity marker)
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';

@@ -1,0 +1,28 @@
+name: Verification Suite
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run Verification Suite (94 assertions)
+        run: node tests/verification-suite.js
+
+      - name: Run Cross-Validation (73 assertions)
+        run: node tests/cross-validation.js

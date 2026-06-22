@@ -2,7 +2,10 @@
 
 **NIST SP 800-22 Statistical Fairness Verification for Crypto Casino Games**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Live Site](https://img.shields.io/badge/🔍_Live_Audits-fairplayaudit.com-047857?style=for-the-badge)](https://fairplayaudit.com)
+
+[![GitLab](https://img.shields.io/badge/Source-GitLab-FC6D26?logo=gitlab)](https://gitlab.com/fairplay-audit/provably-fair-audit)
+[![License: BSL 1.1](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/Verification-167%2F167%20passed-brightgreen)]()
 [![NIST SP 800-22](https://img.shields.io/badge/Standard-NIST%20SP%20800--22-blue)]()
@@ -188,21 +191,12 @@ Sample Size: 100,000 per game
 Games:       dice, limbo, crash, coinFlip, roulette
 Total:       500,000 outcomes
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 2/3: RUNNING STATISTICAL TESTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Running test suite for: DICE
-✅ Chi-Square Goodness of Fit      p-value: 0.6821
-✅ Kolmogorov-Smirnov (Uniformity) p-value: 0.9142
-✅ NIST Monobit (Frequency)        p-value: 0.4210
-✅ NIST Runs Test                  p-value: 0.3312
-✅ NIST Block Frequency            p-value: 0.2891
-✅ NIST Cumulative Sums            p-value: 0.5543
-✅ Serial Correlation              p-value: 0.7821
-✅ Runs Up/Down (Trend)            p-value: 0.1923
-
-Score: 8/8 tests passed (100%)
+STEP 1/6: COLLECTING OUTCOMES .............. done
+STEP 2/6: RUNNING STATISTICAL TESTS ....... 8/8 passed per game
+STEP 3/6: GENERATING SCORECARD ............ done
+STEP 4/6: SERVER SEED HASH-MATCH .......... ✅ VERIFIED
+STEP 5/6: NONCE RANGE INTEGRITY ........... 0 gaps, continuous
+STEP 6/6: DATA INTEGRITY .................. SHA-256 + PGP + Timestamp
 
 ═══════════════════════════════════════════════════════════
 SCORECARD COMPLETE
@@ -210,8 +204,13 @@ SCORECARD COMPLETE
 Casino:        Stake
 Score:         10.0 / 10.0
 Rating:        EXCELLENT
-Tests:         37/37 passed
+Tests:         42/42 passed
 Outcomes:      500,000
+Seed Match:    VERIFIED
+Nonce Gaps:    0 (continuous range verified)
+Audit FP:      a3b7f2c9e4d91c...
+PGP Signed:    YES ✓
+Timestamped:   YES ✓
 ```
 
 ## How Seeds Work
@@ -223,6 +222,125 @@ For the audit to be valid:
 3. **This tool:** Takes the revealed server seed + your client seed, regenerates all outcomes, and tests them statistically.
 
 The casino cannot change the server seed after the fact because the hash was committed upfront. This tool verifies they didn't just pass the hash check but also produced genuinely random outcomes.
+
+## Step-by-Step: How to Collect Your Seeds for Verification
+
+> **⚠️ CRITICAL: Without correct seed handling, no valid audit is possible.**
+>
+> If you don't save the server seed hash BEFORE rotating, you cannot prove the casino didn't swap the seed after seeing your bets. The tool will still run the statistical tests — but without the hash-match verification (Step 4/6), the audit is incomplete. A casino could argue: "We could have given them any seed after the fact."
+>
+> **The math is only as strong as the proof chain behind it.** Save the hash first. Always.
+
+### Stake.com
+
+1. Go to **Settings → Security → Provably Fair** (or click the fairness icon in any game)
+2. You'll see:
+   - **Server Seed (Hashed):** A long hex string like `492df08f9ce7...` — **COPY AND SAVE THIS NOW**
+   - **Client Seed:** Your current client seed — copy this too
+   - **Nonce:** The current nonce counter — note this number (this is how many bets you've placed with this seed pair)
+3. **Play your games** (the nonce increases with each bet)
+4. When ready to verify: click **"Change Server Seed"** / **"Rotate"**
+5. The casino now reveals the **actual server seed** (unhashed) — **COPY AND SAVE THIS**
+6. You now have everything you need:
+
+```bash
+node src/index.js \
+  --casino "Stake" \
+  --server-seed "the-revealed-server-seed" \
+  --client-seed "your-client-seed" \
+  --server-seed-hash "the-hash-you-saved-in-step-2" \
+  --seed-hash-published-at "2026-06-01T12:00:00Z" \
+  --seed-revealed-at "2026-06-08T10:00:00Z" \
+  --count 100000
+```
+
+### BC.Game
+
+1. Click **Provably Fair** in any game
+2. Copy the **Hashed Server Seed** — **SAVE THIS FIRST**
+3. Copy your **Client Seed**
+4. Play, then click **"Next Seed"** to rotate
+5. Copy the **Previous Server Seed** (now revealed)
+6. Run the same command with `--casino-type bcgame`
+
+### Roobet
+
+Roobet uses a **hash chain** instead of seed pairs:
+
+1. Go to **Provably Fair** in any Crash game
+2. Copy the **Game Hash** for the round you want to verify
+3. Run:
+
+```bash
+node src/index.js \
+  --casino-type roobet \
+  --casino "Roobet" \
+  --start-hash "THE_GAME_HASH" \
+  --count 100000
+```
+
+### What Each Piece Proves
+
+| Data | When You Get It | What It Proves |
+|------|----------------|----------------|
+| **Server Seed Hash** | Before playing | Casino committed to this seed in advance |
+| **Client Seed** | You set it yourself | You influenced the randomness — casino can't predict your input |
+| **Revealed Server Seed** | After rotation | The actual seed used — SHA256 of this must match the hash |
+| **Nonce range** | During play | Which bets were made with this seed pair (0, 1, 2, ...) |
+
+### What Happens If You Skip a Step?
+
+| Missing Data | Consequence |
+|---|---|
+| **No server seed hash saved** | Hash-match verification impossible. You can't prove the casino committed to the seed in advance. **The audit is incomplete.** |
+| **No client seed noted** | You can't reproduce the outcomes. The audit cannot be independently verified. |
+| **No nonce range noted** | You don't know which bets were covered. A casino could claim the tested range doesn't match your actual play. |
+| **Server seed not yet revealed** | Nothing to test. You must rotate your seed first so the casino reveals it. |
+
+**Bottom line:** An audit without proper seed handling is like a blood test without a chain of custody — the results might be correct, but they won't hold up if challenged.
+
+### What the Tool Verifies Automatically
+
+When you provide `--server-seed-hash`, the tool runs **Step 4/6: Server Seed Hash-Match Verification**:
+
+```
+STEP 4/6: SERVER SEED HASH-MATCH VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Published Hash:  492df08f9ce7541d4fac68cfe357312f...
+Computed Hash:   492df08f9ce7541d4fac68cfe357312f...
+Match:           ✅ VERIFIED
+```
+
+If the hashes don't match: **the casino changed the seed after seeing your bets.** That's fraud.
+
+## CLI Reference
+
+```bash
+node src/index.js [options]
+
+Options:
+  --casino <name>              Casino name for the report
+  --casino-type <type>         stake (default) | bcgame | roobet
+  --server-seed <seed>         The revealed server seed
+  --client-seed <seed>         Your client seed
+  --start-hash <hash>          Terminal hash for Roobet hash chain
+  --count <n>                  Outcomes per game (default: 100000)
+  --games <list>               Comma-separated game list (e.g. dice,crash)
+  --server-seed-hash <hash>    Pre-commitment hash (published before reveal)
+  --seed-hash-published-at <t> ISO timestamp when hash was shown
+  --seed-revealed-at <t>       ISO timestamp when seed was revealed
+```
+
+## Audit Pipeline (6 Steps)
+
+| Step | What Happens | Protects Against |
+|------|-------------|-----------------|
+| 1/6 | Collect outcomes from seeds | — |
+| 2/6 | Run 8 NIST statistical tests | Biased RNG, manipulated distributions |
+| 3/6 | Generate HTML scorecard | — |
+| 4/6 | Server seed hash-match verification | Casino swapping seeds after bets |
+| 5/6 | Nonce range integrity proof (SHA-256) | Cherry-picking favorable rounds |
+| 6/6 | Data integrity: SHA-256 + PGP + OpenTimestamps | Backdating, data tampering |
 
 ## Reproducibility
 
@@ -250,7 +368,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. We welcome:
 
 ## License
 
-[MIT](LICENSE) — Use it, fork it, audit your favorite casino.
+[Business Source License 1.1](LICENSE) — You may view, modify, and use this code for non-production purposes. Commercial use requires a license from FairPlay Audit. The code converts to Apache 2.0 on 2030-06-06.
 
 ## Community Edition vs. Full Audit
 

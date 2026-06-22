@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "FairPlay Audit — NIST SP 800-22 Statistical Fairness Verification for Provably Fair Casino Games",
   "author": "FairPlay Audit (https://fairplayaudit.com)",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "BSL-1.1",
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/fairplay-audit/provably-fair-audit"
