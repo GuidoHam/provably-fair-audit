@@ -3,10 +3,10 @@
   "version": "2.0.0",
   "description": "FairPlay Audit — NIST SP 800-22 Statistical Fairness Verification for Provably Fair Casino Games",
   "author": "FairPlay Audit (https://fairplayaudit.com)",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GuidoHam/provably-fair-audit"
+    "url": "https://gitlab.com/fairplay-audit/provably-fair-audit"
   },
   "keywords": [
     "provably-fair",
@@ -23,10 +23,15 @@
   "scripts": {
     "generate": "node src/index.js",
     "collect": "node src/collector.js",
+    "collect-bitsler": "node src/bitsler-collector.js",
+    "collect-roulette": "node src/bitsler-roulette-collector.js",
     "test-rng": "node src/rng-tester.js",
-    "report": "node src/report-generator.js"
+    "report": "node src/report-generator.js",
+    "compare": "node src/consistency-comparator.js",
+    "start": "node src/server.js",
+    "test": "node tests/verification-suite.js && node tests/cross-validation.js && node tests/consistency-tests.js"
   },
   "dependencies": {
-    "randomness": "^0.0.0-development"
+    "express": "^5.2.1"
   }
 }

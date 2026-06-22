@@ -1,0 +1,12 @@
+stages:
+  - test
+
+test:
+  stage: test
+  image: node:20-slim
+  script:
+    - npm install --production=false
+    - npm test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

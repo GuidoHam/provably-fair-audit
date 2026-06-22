@@ -41,7 +41,7 @@ Adding a new casino requires only implementing its byte-to-outcome mapping in `c
 
 ```bash
 # Clone
-git clone https://github.com/GuidoHam/provably-fair-audit.git
+git clone https://gitlab.com/fairplay-audit/provably-fair-audit.git
 cd provably-fair-audit
 
 # Run full audit (Stake, 100k outcomes per game, sample seeds)
