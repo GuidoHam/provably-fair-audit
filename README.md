@@ -16,6 +16,8 @@
 
 **Live audits:** [fairplayaudit.com](https://fairplayaudit.com)
 
+**Published in three languages:** [English](https://fairplayaudit.com/) · [Español](https://fairplayaudit.com/es/) · [Português](https://fairplayaudit.com/pt/)
+
 ---
 
 ## Why This Exists
